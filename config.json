@@ -1,0 +1,40 @@
+{
+  "name": "",
+  "css_prefix_text": "icon-",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "500cde26773d15aaac1bfaa2a33cc5a9",
+      "css": "spread",
+      "code": 62759,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "5adef5b3275fcd874b0815a0637c5800",
+      "css": "login",
+      "code": 61484,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "a6b6f85116fc55e4a7c83d66973035a7",
+      "css": "logout",
+      "code": 61485,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "7336247ba3db350dec8d6c0a47cef966",
+      "css": "cog",
+      "code": 59392,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "018571e697f22ca41803de480e10ed10",
+      "css": "home",
+      "code": 59393,
+      "src": "mfglabs"
+    }
+  ]
+}
