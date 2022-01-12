@@ -18,7 +18,9 @@ body{
 
 .bg-piggy
 {
-	background-color: #73A580 !important;
+	/*background-color: #73A580 !important;*/
+	background-color: red;
+	
 }
 
 .navbar-item a
