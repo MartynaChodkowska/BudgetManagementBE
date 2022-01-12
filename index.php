@@ -34,7 +34,7 @@ session_start();
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/pigybank1.jpg" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
 				<?php
 				if(isset($_SESSION['login'])) 
 				{
@@ -54,7 +54,7 @@ session_start();
 			<div class="collapse navbar-collapse" id="mainmenu">
 				<ul class="navbar-nav ml-auto">
 					<li class="navbar-item active">
-						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
+						<a class="nav-link" href="index.php" active><i class="icon-home"></i> Home</a>
 					</li>
 					<li class="navbar-item">
 						<a class="nav-link" href="signin.php"><i class="icon-login"></i> Sign in</a>
@@ -83,26 +83,23 @@ session_start();
 				<div class="intro col-sm-12">
 					<div class="card-deck">
 						<div class="card col-xs-12 col-lg-6 bg-piggy">
-							<img class="card-img-top my-2"  src="https://source.unsplash.com/1500/700"" alt="questionMarks">
+							<img class="card-img-top my-2"  src="img/messyhead.png" alt="">
 							<div class="card-body bg-piggy">
 								<p class="card-text">
 									<p>too little incomes, too little spendings?</p>
-									<p>too little incomes, too much spendings?</p>						
-									<p>too much spendings on the end of month?</p>
+									<p>too little incomes, too much spendings?</p>
 									<p>too much incomes, too much spendings?</p>		
 									<p>too much incomes, too little spendings?<p/>
-									<p>too little of month left, too much spendings ahead?</p>
+									<h5 class="card-title">don't let your head explode!</h5>
 								</p>
 							</div>
 						</div>		
 						<div class="card col-xs-12 col-lg-6 bg-piggy">
-							<img class="card-img-top my-2"  src="https://source.unsplash.com/1500/700" alt="headExplode">
+							<img class="card-img-top my-2"  src="img/clear.png" alt="headExplode">
 							<div class="card-body bg-piggy">
-								<h5 class="card-title">don't let your head explode. keep it simple!</h5>
-								<p class="card-text">let's make it the best possible way -
-									<span class="d-block">just right incomes,</span>
-									<span class="d-block">just right spendings</span>
-									<span class="d-block">and finally - savings.</span>
+								<h5 class="card-title">let's keep it simple</h5>
+								<p class="card-text">& make it the best possible way -
+									<span class="d-block">clear, plain & beautiful!</span>
 								</p>
 							</div>
 						</div>
