@@ -1,10 +1,5 @@
 <?php
 session_start();
-
-if (isset($_SESSION['logged'])) 
-{
-	header('Location: indexlogged.php');
-}
 ?>
 
 <!DOCTYPE HTML>
@@ -109,18 +104,6 @@ if (isset($_SESSION['logged']))
 							</div>
 						</div>
 					</div>	
-						<div class="card logCard col-12 bg-piggy mt-4">
-							<div class="card-body bg-piggy">
-								<h5 class="display-4 card-title my-3">let's start</h5>
-								<p class="card-text">
-									<div class = "mt-1">
-									<a href="login.php"><button type="button">sign in</button></a>
-									 or  <a href="regi.php"><button type="button">join us</button></a> if you haven't signed up yet
-									</div>
-								</p>
-							</div>
-						</div>
-							
 				</div>
 			</div>
 <?php

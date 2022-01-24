@@ -7,9 +7,10 @@ session_start();
 			//validation ok
 			$allOK = true;
 			
+				
 			//if login correct
 			$login = $_POST['userName'];
-			
+						
 			if((strlen($login)<3) || (strlen($login)>20))
 			{
 				$allOK = false;
@@ -189,7 +190,18 @@ session_start();
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/pigybank1.jpg" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">feed the piggy</a>
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
+				<?php
+				if(isset($_SESSION['login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
@@ -201,7 +213,7 @@ session_start();
 						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
 					</li>
 					<li class="navbar-item">
-						<a class="nav-link" href="#"><i class="icon-login"></i> Sign in</a>
+						<a class="nav-link" href="login.php"><i class="icon-login"></i> Sign in</a>
 					</li>	
 					<li class="navbar-item active">
 						<a class="nav-link" href="regi.php" active><i class="icon-spread"></i> Join us</a>
@@ -217,15 +229,14 @@ session_start();
 	<main>
 		<section>
 			<div class="container">
-				
 				<form id="registration" method="post">
 					<h3 class="my-3">Registration</h3>
 					<hr>
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="userName">User name</label>
-						<input type="text" class="form-control d-block" id="userName" name="userName" aria-descirbedby="userName" placeholder="username" onfocus="this.placeholder=''" onblur="this.placeholder='username'">
+						<input type="text" class="form-control d-block" id="userName" name="userName" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'">
 					</div>
-					<br />
+					
 					<?php
 						if(isset($_SESSION['e_login']))
 						{
@@ -236,8 +247,9 @@ session_start();
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="firstName">First name</label>
 						<input type="text" class="form-control d-block" id="firstName" name="firstName" aria-descirbedby="firstName" placeholder="first name" onfocus="this.placeholder=''" onblur="this.placeholder='first name'">
+											
 					</div>
-					<br />
+				
 					<?php
 						if(isset($_SESSION['e_firstname']))
 						{
@@ -249,7 +261,7 @@ session_start();
 						<label for="secondName">Second name</label>
 						<input type="text" class="form-control d-block" id="secondName" name="secondName" aria-descirbedby="secondName" placeholder="second name" onfocus="this.placeholder=''" onblur="this.placeholder='second name'">
 					</div>
-					<br />
+					
 					<?php
 						if(isset($_SESSION['e_secondname']))
 						{
@@ -264,11 +276,10 @@ session_start();
 					<div>
 					<br />-->
 						
-					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-2">
+					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-2 md-0">
 						<label for="password">Password</label>
 						<input type="password" class="form-control d-block" id="password" name="password" aria-descirbedby="password" placeholder="password" onfocus="this.placeholder=''" onblur="this.placeholder='password'">
 					</div>
-					<br />
 					<?php
 						if(isset($_SESSION['e_password']))
 						{

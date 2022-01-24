@@ -1,11 +1,16 @@
 <?php
-	session_start();
-	
-	if(!isset($_SESSION['logged']))
-	{
-		header('Location: index.php');
-		exit();
-	}
+
+session_start();
+
+if(isset($_POST['amount']))
+{
+	$_SESSION['amount']=$_POST['amount'];
+	$_SESSION['date']=$_POST['date'];
+	$_SESSION['group']=$_POST['selectMenu'];
+	$_SESSION['type']='Income';
+	header('Location: try.php');
+}
+
 ?>
 
 <!DOCTYPE HTML>
@@ -40,22 +45,28 @@
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">Nice to see you, <?= $_SESSION['login']?>!</a>
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
+			<?php
+				if(isset($_SESSION['login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			
-					
 			<div class="collapse navbar-collapse" id="mainmenu">
 				<ul class="navbar-nav ml-auto">
-					
 					<li class="navbar-item">
 						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
-					</li>	
-					<li class="navbar-item">
-						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
-					</li>
+					</li>					
 					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
 					</li>
@@ -67,35 +78,50 @@
 	<main>	
 		<article>
 			<div class="container">
-				
-				<div class="row mt-5 mx-auto">
-					
-					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<a href="addincome.php">
-							<div class="icon">A</div>add income
-							</a>
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">Y</div>add expense
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">k</div>display balance sheet
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">u</div>categories manager
-						</button>	
+				<div class="row mx-auto">
+						
+					<div class="addTransaction col-lg-8 bg-dark border border-secondary rounded-right mt-5">
+						<h1 class="h3 col-12 mb-4"> transaction details</h1>
+						<form id="addIncome" method="post">
+							<div class="form-group col-6 offset-3">
+								<label for="amount">Income amount</label>
+								<input type="number" step="0.01"class="form-control" name="amount" id="amount" value=""  required>
+							</div>
+							<div class="form-group col-6 offset-3">
+								<label for="datePicker">Income date</label>
+								<input type="date" class="form-control" id="datePicker" name="date" required">
+							</div>
+							<div class="form-group col-6 offset-3">
+								<label for="selectMenu">Income category</label>
+								<select id="selectMenu" name="selectMenu" class="form-control ">
+									<option value="salary" selected>salary</option>
+									<option value="interest">interest</option>
+									<option value="selling">selling</option>
+									<option value="bonus">bonus</option>
+									<option value="other">other</option>
+								</select> 
+							</div>
+							<div class="form-group col-6 offset-3">
+								<label for="comment">Comment</label>
+								<textarea name="comment" id="comment" rows="3" class="col-12"></textarea>
+							</div>
+							<div class="form-group">
+								
+								<input type="submit" value="Add income" class="d-inline-block col-4" >
+								<input type="reset" value="Cancel" class="d-inline-block col-4">
+							</div>
+						</form>
 					</div>
-					
-					<aside class="col-lg-4">
+						
+					<aside class="col-lg-4 mt-4">
 						<h5>Transactions review</h5>
 						<ul>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
+							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action active">add income</a>
+							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
+							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
