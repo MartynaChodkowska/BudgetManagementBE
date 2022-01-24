@@ -1,10 +1,10 @@
 <?php
 session_start();
-
+/*
 if (isset($_SESSION['logged'])) 
 {
-	header('Location: indexlogged.php');
-}
+	header('Location: budget.php');
+}*/
 ?>
 
 <!DOCTYPE HTML>
@@ -58,17 +58,14 @@ if (isset($_SESSION['logged']))
 			
 			<div class="collapse navbar-collapse" id="mainmenu">
 				<ul class="navbar-nav ml-auto">
-					<li class="navbar-item active">
+					<li class="navbar-item">
 						<a class="nav-link" href="index.php" ><i class="icon-home"></i> Home</a>
 					</li>
-					<li class="navbar-item">
+					<li class="navbar-item active">
 						<a class="nav-link" href="login.php"><i class="icon-login"></i> Sign in</a>
 					</li>	
 					<li class="navbar-item">
 						<a class="nav-link" href="regi.php"><i class="icon-spread"></i> Join us</a>
-					</li>
-					<li class="navbar-item">
-						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
 					</li>					
 					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
@@ -79,56 +76,33 @@ if (isset($_SESSION['logged']))
 	</header>
 		
 	<main>	
-		<section class="west">
+		<section>
 			<div class="container">
-				<header>
-					<h1  class="display-5 my-4">let's make a masterpiece of your money!</h1>
-				</header>
-				
-				<div class="intro col-sm-12">
-					<div class="card-deck">
-						<div class="card col-xs-12 col-lg-6 bg-piggy">
-							<img class="card-img-top my-2"  src="img/messyhead.png" alt="">
-							<div class="card-body bg-piggy">
-								<p class="card-text">
-									<p>too little incomes, too little spendings?</p>
-									<p>too little incomes, too much spendings?</p>
-									<p>too much incomes, too much spendings?</p>		
-									<p>too much incomes, too little spendings?<p/>
-									<h5 class="card-title">don't let your head explode!</h5>
-								</p>
-							</div>
-						</div>		
-						<div class="card col-xs-12 col-lg-6 bg-piggy">
-							<img class="card-img-top my-2"  src="img/clear.png" alt="headExplode">
-							<div class="card-body bg-piggy">
-								<h5 class="card-title">let's keep it simple</h5>
-								<p class="card-text">& make it the best possible way -
-									<span class="d-block">clear, plain & beautiful!</span>
-								</p>
-							</div>
-						</div>
-					</div>	
-						<div class="card logCard col-12 bg-piggy mt-4">
-							<div class="card-body bg-piggy">
-								<h5 class="display-4 card-title my-3">let's start</h5>
-								<p class="card-text">
-									<div class = "mt-1">
-									<a href="login.php"><button type="button">sign in</button></a>
-									 or  <a href="regi.php"><button type="button">join us</button></a> if you haven't signed up yet
-									</div>
-								</p>
-							</div>
-						</div>
-							
+				<form id="logIn" action="signin.php" method="post">
+					<h3 class="my-3">Sign in</h3>
+					<hr>
+					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+						<label for="userName">User name</label>
+						<input type="text" class="form-control d-block" name="login" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'">
+					</div>
+					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+						<label for="password">Password</label>
+						<input type="password" name="password" class="form-control d-block"  placeholder="password" onfocus="this.placeholder=''" onblur="this.placeholder='password'">
+					</div>
+					<input type="submit" class="d-block col-sm-6 offset-sm-3 col-md-4 offset-md-4 col-lg-4 offset-lg-4 my-5" value="enter">
+				</form>
+				<hr>
+				<div class="goToRegistration d-block mt-4">
+					or click <a href="regi.php">here</a> if you haven't signed up yet
 				</div>
 			</div>
-<?php
+			<?php
 
-	if(isset($_SESSION['blad'])) echo $_SESSION['blad'];
-?>
+				if(isset($_SESSION['blad'])) echo $_SESSION['blad'];
+			?>
 		</section>
 	</main>	
+	
 	<footer class="text-center mt-5">
 		<h6>Thanks for visiting me! &copy; All rights reserved</h6>
 	</footer>

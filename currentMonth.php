@@ -1,10 +1,43 @@
 <?php
-	session_start();
-	
-	if(!isset($_SESSION['logged']))
+session_start();
+require_once 'connect.php';
+
+mysqli_report(MYSQLI_REPORT_STRICT);
+
+try
 	{
-		header('Location: index.php');
-		exit();
+		$link = @new mysqli($host, $db_user, $db_password, $db_name);
+
+		if($link->connect_errno!=0)
+			{
+				throw new Exception(mysqli_connect_errno());
+			}
+		else
+		{
+			$id = $_SESSION['userId'];
+			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id";
+			if($result = @$link->query($sql))
+			{
+				$transactionsQty = $result->num_rows;
+				$rows = $result->fetch_all(MYSQLI_ASSOC);
+				$result->free_result();
+			}
+			
+			
+			else
+			{
+				throw new Exception(mysqli_connect_errno());
+			}
+			
+			
+			$link->close();
+		}
+		
+	}
+catch(Exception $e)
+	{
+		echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
+		echo '<br />Dev info: '.$e;
 	}
 ?>
 
@@ -40,7 +73,18 @@
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">Nice to see you, <?= $_SESSION['login']?>!</a>
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
+				<?php
+				if(isset($_SESSION['login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
@@ -69,33 +113,42 @@
 			<div class="container">
 				
 				<div class="row mt-5 mx-auto">
-					
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<a href="addincome.php">
-							<div class="icon">A</div>add income
-							</a>
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">Y</div>add expense
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">k</div>display balance sheet
-						</button>
-						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<div class="icon">u</div>categories manager
-						</button>	
+							<div class = "statement">
+							<?php
+								if(isset($_SESSION['transactionAdded']))
+								{
+									echo "Transaction has been successfully added!";
+									unset($_SESSION['transactionAdded']);
+								}
+							
+							?>
+						</div>
+						<table>
+							<thead>
+								<tr><th colspan="4">running month transactions: </th></tr>
+								<tr><th>date</th><th>amount</th><th>group</th><th>type</th></tr>
+							</thead>
+							<tbody>
+								<?php
+								foreach($rows as $row)
+								{
+									echo"<tr><td>{$row['date']}</td><td>{$row['amount']}</td><td>{$row['transactionGroup']}</td><td>{$row['transactionType']}</td></tr>";
+								}
+								?>
+							</tbody>
+						</table>
 					</div>
 					
 					<aside class="col-lg-4">
 						<h5>Transactions review</h5>
 						<ul>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
+							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
+							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
+							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action active">running month</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
 							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
