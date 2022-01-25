@@ -15,7 +15,9 @@ if(isset($_POST['amount']))
 	$_SESSION['amount']=$_POST['amount'];
 	$_SESSION['date']=$_POST['date'];
 	$_SESSION['group']=$_POST['selectMenu'];
+	$_SESSION['comment']=$_POST['comment'];
 	$_SESSION['type']='Income';
+
 	header('Location: try.php');
 }
 
