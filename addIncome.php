@@ -2,6 +2,14 @@
 
 session_start();
 
+if(!isset($_SESSION['logged']))
+{
+	header('Location: index.php');
+	exit();
+}
+
+unset($_SESSION['transactionAdded']);
+
 if(isset($_POST['amount']))
 {
 	$_SESSION['amount']=$_POST['amount'];
@@ -66,7 +74,13 @@ if(isset($_POST['amount']))
 				<ul class="navbar-nav ml-auto">
 					<li class="navbar-item">
 						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
-					</li>					
+					</li>
+					<li class="navbar-item">
+						<a class="nav-link" href="budget.php"><i class="icon-user"></i>My account</a>
+					</li>
+					<li class="navbar-item">
+						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
+					</li>						
 					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
 					</li>
@@ -85,7 +99,7 @@ if(isset($_POST['amount']))
 						<form id="addIncome" method="post">
 							<div class="form-group col-6 offset-3">
 								<label for="amount">Income amount</label>
-								<input type="number" step="0.01"class="form-control" name="amount" id="amount" value=""  required>
+								<input type="number" step="0.01" min="0.00"class="form-control" name="amount" id="amount" value=""  required>
 							</div>
 							<div class="form-group col-6 offset-3">
 								<label for="datePicker">Income date</label>
@@ -93,7 +107,7 @@ if(isset($_POST['amount']))
 							</div>
 							<div class="form-group col-6 offset-3">
 								<label for="selectMenu">Income category</label>
-								<select id="selectMenu" name="selectMenu" class="form-control ">
+								<select id="selectMenu" name="selectMenu" class="form-control">
 									<option value="salary" selected>salary</option>
 									<option value="interest">interest</option>
 									<option value="selling">selling</option>
@@ -118,6 +132,7 @@ if(isset($_POST['amount']))
 						<ul>
 							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action active">add income</a>
 							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
+							<a href="lastTransactions.php" class="list-group-item list-group-item-dark list-group-item-action">last transactions</a>
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>

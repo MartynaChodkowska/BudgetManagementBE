@@ -68,9 +68,6 @@ if (isset($_SESSION['logged']))
 						<a class="nav-link" href="regi.php"><i class="icon-spread"></i> Join us</a>
 					</li>
 					<li class="navbar-item">
-						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
-					</li>					
-					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
 					</li>
 				</ul>

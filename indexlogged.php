@@ -57,7 +57,7 @@ session_start();
 						<a class="nav-link" href="index.php" ><i class="icon-home"></i> Home</a>
 					</li>
 					<li class="navbar-item">
-						<a class="nav-link" href="login.php"><i class="icon-login"></i> Sign in</a>
+						<a class="nav-link" href="budget.php"><i class="icon-user"></i>My account</a>
 					</li>	
 					<li class="navbar-item">
 						<a class="nav-link" href="regi.php"><i class="icon-spread"></i> Join us</a>

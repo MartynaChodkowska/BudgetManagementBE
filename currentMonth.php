@@ -15,11 +15,11 @@ try
 		else
 		{
 			$id = $_SESSION['userId'];
-			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id";
+			
+			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id AND transactionType='Income' AND (Month(date) =  Month(now())) ORDER BY date DESC";
 			if($result = @$link->query($sql))
 			{
-				$transactionsQty = $result->num_rows;
-				$rows = $result->fetch_all(MYSQLI_ASSOC);
+				$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
 				$result->free_result();
 			}
 			
@@ -96,7 +96,10 @@ catch(Exception $e)
 					
 					<li class="navbar-item">
 						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
-					</li>	
+					</li>
+					<li class="navbar-item">
+						<a class="nav-link" href="budget.php"><i class="icon-user"></i>My account</a>
+					</li>					
 					<li class="navbar-item">
 						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
 					</li>
@@ -114,27 +117,20 @@ catch(Exception $e)
 				
 				<div class="row mt-5 mx-auto">
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-							<div class = "statement">
-							<?php
-								if(isset($_SESSION['transactionAdded']))
-								{
-									echo "Transaction has been successfully added!";
-									unset($_SESSION['transactionAdded']);
-								}
-							
-							?>
-						</div>
-						<table>
+						<table class="table table-sm table-striped table-dark mt-5 mx-auto border">
 							<thead>
-								<tr><th colspan="4">running month transactions: </th></tr>
-								<tr><th>date</th><th>amount</th><th>group</th><th>type</th></tr>
+								<tr><th colspan="3" class="p-3 border border-bottom">running month Incomes </th></tr>
+								<tr><th>date</th><th>group</th><th>amount</th></tr>
 							</thead>
 							<tbody>
 								<?php
-								foreach($rows as $row)
+								$totalAmount=0;
+								foreach($incomesRows as $incomeRow)
 								{
-									echo"<tr><td>{$row['date']}</td><td>{$row['amount']}</td><td>{$row['transactionGroup']}</td><td>{$row['transactionType']}</td></tr>";
+									echo"<tr><td>{$incomeRow['date']}</td><td>{$incomeRow['transactionGroup']}</td><td>{$incomeRow['amount']} PLN</td></tr>";
+									$totalAmount+=$incomeRow['amount'];
 								}
+								echo "<tr><th colspan='2' class='text-right'>total </th><th>$totalAmount PLN</th></tr>"
 								?>
 							</tbody>
 						</table>
@@ -145,6 +141,7 @@ catch(Exception $e)
 						<ul>
 							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
 							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
+							<a href="lastTransactions.php" class="list-group-item list-group-item-dark list-group-item-action">last transactions</a>
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>

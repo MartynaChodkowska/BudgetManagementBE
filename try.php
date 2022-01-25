@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-
+	$_SESSION['transactionAdded']=false;
 	$userId = $_SESSION['userId'];
 	$date = $_SESSION['date'];
 	$amount = $_SESSION['amount'];
@@ -27,7 +27,7 @@ session_start();
 			{
 				$_SESSION['transactionAdded']=true;
 				$connection->close();
-				header('Location: currentMonth.php');
+				header('Location: lastTransactions.php');
 			}
 			else
 			{

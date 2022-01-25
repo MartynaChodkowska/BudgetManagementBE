@@ -1,3 +1,25 @@
+<?php
+
+session_start();
+
+if(!isset($_SESSION['logged']))
+{
+	header('Location: index.php');
+	exit();
+}
+
+unset($_SESSION['transactionAdded']);
+
+if(isset($_POST['amount']))
+{
+	$_SESSION['amount']=$_POST['amount'];
+	$_SESSION['date']=$_POST['date'];
+	$_SESSION['group']=$_POST['selectMenu'];
+	$_SESSION['type']='Expense';
+	header('Location: try.php');
+}
+
+?>
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -30,7 +52,18 @@
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="#"><img src="img/pigybank1.jpg" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">feed the piggy</a>
+			<a class="navbar-brand" href="#"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
+			<?php
+				if(isset($_SESSION['login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
@@ -39,7 +72,13 @@
 			<div class="collapse navbar-collapse" id="mainmenu">
 				<ul class="navbar-nav ml-auto">
 					<li class="navbar-item">
-						<a class="nav-link" href="#"><i class="icon-home"></i> Home</a>
+						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
+					</li>
+					<li class="navbar-item">
+						<a class="nav-link" href="budget.php"><i class="icon-user"></i>My account</a>
+					</li>
+					<li class="navbar-item">
+						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
 					</li>					
 					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
@@ -56,26 +95,26 @@
 						
 					<div class="addTransaction col-lg-8 bg-dark border border-secondary rounded-right mt-5">
 						<h1 class="h3 col-12 mb-4"> transaction details</h1>
-						<form id="addIncome">
+						<form id="addExpense" method="post">
 							<div class="form-group col-6 offset-3">
-								<label for="currency-field">Expense amount</label>
-								<input type="text" class="form-control" name="currency-field" id="currency-field" value="" data-type="currency" placeholder="PLN 1,000" required>
+								<label for="amount">Income amount</label>
+								<input type="number" step="0.01" min="0.00"class="form-control" name="amount" id="amount" value=""  required>
 							</div>
 							<div class="form-group col-6 offset-3">
-								<label for="datePicker">Expense date</label>
-								<input type="date" class="form-control" id="datePicker" required">
+								<label for="datePicker">Income date</label>
+								<input type="date" class="form-control" id="datePicker" name="date" required">
 							</div>
 							<div class="form-group col-6 offset-3">
 								<label for="selectMenu">Expense category</label>
-								<select id="selectMenu" name="selectMenu" class="form-control ">
-									<option value="6">house rent</option>
-									<option value="7">media fee</option>
-									<option value="8">credit fee</option>
-									<option value="9" selected>shopping</option>
-									<option value="10">entertaiment</option>
-									<option value="11">kids</option>
-									<option value="12">cosmetics</option>
-									<option value="13">other</option>
+								<select id="selectMenu" name="selectMenu" class="form-control">
+									<option value="'house rent'">house rent</option>
+									<option value="media">media</option>
+									<option value="credit">credit</option>
+									<option value="shopping" selected>shopping</option>
+									<option value="entertaiment">entertaiment</option>
+									<option value="kids">kids</option>
+									<option value="cosmetics">cosmetics</option>
+									<option value="other">other</option>
 								</select> 
 							</div>
 							<div class="form-group col-6 offset-3">
@@ -95,6 +134,7 @@
 						<ul>
 							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
 							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action active">add expense</a>
+							<a href="lastTransactions.php" class="list-group-item list-group-item-dark list-group-item-action">last transactions</a>
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
