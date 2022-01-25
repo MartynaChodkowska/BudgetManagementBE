@@ -7,6 +7,7 @@ session_start();
 	$amount = $_SESSION['amount'];
 	$group = $_SESSION['group'];
 	$type = $_SESSION['type'];
+	$note = $_SESSION['comment'];
 	
 	//połącz z bazą
 	require_once "connect.php";
@@ -23,7 +24,7 @@ session_start();
 		else
 		{
 			//add transaction to db
-			if($connection->query("INSERT INTO transactions VALUES(NULL, '$userId', '$date', '$amount', '$group', '$type')"))
+			if($connection->query("INSERT INTO transactions VALUES(NULL, '$userId', '$date', '$amount', '$group', '$type', '$note')"))
 			{
 				$_SESSION['transactionAdded']=true;
 				$connection->close();
