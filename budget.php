@@ -82,7 +82,9 @@
 							</a>
 						</button>
 						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
+							<a href="balanceSheet.php">
 							<div class="icon">k</div>display balance sheet
+							</a>
 						</button>
 						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
 							<div class="icon">u</div>categories manager
@@ -99,9 +101,10 @@
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
 							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+							<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
+							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
+							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action">custom dates</a>
 						</ul>
 						<h5 class="mt-5">Categories manager</h5>
 						<ul>
