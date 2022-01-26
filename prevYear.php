@@ -6,7 +6,7 @@ if(!isset($_SESSION['logged']))
 		header('Location: index.php');
 		exit();
 	}
-
+	
 require_once 'connect.php';
 
 mysqli_report(MYSQLI_REPORT_STRICT);
@@ -23,7 +23,7 @@ try
 		{
 			$id = $_SESSION['userId'];
 			
-			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id AND (Month(date) =  Month(now())) AND (Year(date) =  Year(now())) AND transactionType='Income' ORDER BY date DESC";
+			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Income' ORDER BY date DESC";
 			if($result = @$link->query($sql))
 			{
 				$incomesQnty = $result->num_rows;
@@ -35,7 +35,7 @@ try
 				throw new Exception(mysqli_connect_errno());
 			}
 			
-			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id AND (Month(date) =  Month(now())) AND (Year(date) =  Year(now())) AND transactionType='Expense' ORDER BY date DESC";
+			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Expense' ORDER BY date DESC";
 			if($result = @$link->query($sql))
 			{
 				$expensesQnty = $result->num_rows;
@@ -139,8 +139,8 @@ catch(Exception $e)
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
 						<table class="table table-sm table-striped table-dark table-hover mt-5 mx-auto border">
 							<thead>
-								<tr><th colspan="3" class="p-3 border border-bottom">running month Incomes</th></tr>
-								<tr><th>date</th><th>group</th><th>amount</th></tr>
+								<tr><th colspan="4" class="p-3 border border-bottom">running year Incomes</th></tr>
+								<tr><th>date</th><th>group</th><th>amount</th><th>comment</th></tr>
 							</thead>
 							<tbody>
 								<?php
@@ -149,23 +149,23 @@ catch(Exception $e)
 								{
 									foreach($incomesRows as $incomeRow)
 									{
-											echo"<tr><td>{$incomeRow['date']}</td><td>{$incomeRow['transactionGroup']}</td><td>{$incomeRow['amount']} PLN</td></tr>";
-											$totalIncomes+=$incomeRow['amount'];
+										echo"<tr><td>{$incomeRow['date']}</td><td>{$incomeRow['transactionGroup']}</td><td>{$incomeRow['amount']} PLN</td><td>{$incomeRow['comment']}</td></tr>";
+										$totalIncomes+=$incomeRow['amount'];
 									}
 								}
 								else
 								{
-									echo "<tr><td colspan='3'>there is no incomes</td></tr>";
+									echo "<tr><td colspan='4'>there is no incomes</td></tr>";
 								}
-								echo "<tr><th colspan='2' class='text-right'>total</th><th style='color: ForestGreen;'>$totalIncomes PLN</th></tr>"
+								echo "<tr><th colspan='2' class='text-right'></th><th style='color: ForestGreen;'>$totalIncomes PLN</th></tr>"
 								?>
 							</tbody>
 						</table>
 						<hr>
 						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto border">
 							<thead>
-								<tr><th colspan="3" class="p-3 border border-bottom">running month Expenses</th></tr>
-								<tr><th>date</th><th>group</th><th>amount</th></tr>
+								<tr><th colspan="4" class="p-3 border border-bottom">running year Expenses</th></tr>
+								<tr><th>date</th><th>group</th><th>amount</th><th>comment</th></tr>
 							</thead>
 							<tbody>
 								<?php
@@ -174,15 +174,15 @@ catch(Exception $e)
 								{
 									foreach($expensesRows as $expenseRow)
 									{
-										echo"<tr><td>{$expenseRow['date']}</td><td>{$expenseRow['transactionGroup']}</td><td>{$expenseRow['amount']} PLN</td></tr>";
+										echo"<tr><td>{$expenseRow['date']}</td><td>{$expenseRow['transactionGroup']}</td><td>{$expenseRow['amount']} PLN</td><td>{$expenseRow['comment']}</td></tr>";
 										$totalExpenses+=$expenseRow['amount'];
 									}
 								}
 								else
 								{
-									echo "<tr><td colspan='3'>there is no expenses</td></tr>";
+									echo "<tr><td colspan='4'>there is no expenses</td></tr>";
 								}
-								echo "<tr><th colspan='2' class='text-right'>total</th><th style='color: FireBrick;'>$totalExpenses PLN</th></tr>";
+								echo "<tr><th colspan='2' class='text-right'></th><th style='color: FireBrick;'>$totalExpenses PLN</th></tr>";
 								?>
 							</tbody>
 						</table>
@@ -196,6 +196,7 @@ catch(Exception $e)
 							<tbody>
 								<tr>
 									<th scope="row">total Incomes</th>
+									
 									<?php
 									
 									echo "<td style='color: ForestGreen;'>$totalIncomes PLN</td>";
@@ -246,10 +247,10 @@ catch(Exception $e)
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
-							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action active">running month</a>
+							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
 							<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
-							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
-							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action ">running year</a>
+							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action active">previous year</a>
 							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action">custom dates</a>
 						</ul>
 						<h5 class="mt-5">Categories manager</h5>
