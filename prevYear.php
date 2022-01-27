@@ -23,7 +23,7 @@ try
 		{
 			$id = $_SESSION['userId'];
 			
-			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Income' ORDER BY date DESC";
+			$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Income' GROUP BY transactionGroup ORDER BY totalAmount DESC";
 			if($result = @$link->query($sql))
 			{
 				$incomesQnty = $result->num_rows;
@@ -35,7 +35,7 @@ try
 				throw new Exception(mysqli_connect_errno());
 			}
 			
-			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Expense' ORDER BY date DESC";
+			$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 YEAR) AND transactionType='Expense' GROUP BY transactionGroup ORDER BY totalAmount DESC";
 			if($result = @$link->query($sql))
 			{
 				$expensesQnty = $result->num_rows;
@@ -137,10 +137,10 @@ catch(Exception $e)
 				
 				<div class="row mt-5 mx-auto">
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-						<table class="table table-sm table-striped table-dark table-hover mt-5 mx-auto border">
+						<table class="table table-sm table-striped table-dark table-hover mt-5 mx-auto">
 							<thead>
-								<tr><th colspan="4" class="p-3 border border-bottom">running year Incomes</th></tr>
-								<tr><th>date</th><th>group</th><th>amount</th><th>comment</th></tr>
+								<tr><th colspan="2" class="p-3  border-bottom">running month Incomes</th></tr>
+								<tr><th>category</th><th>amount</th></tr>
 							</thead>
 							<tbody>
 								<?php
@@ -149,23 +149,25 @@ catch(Exception $e)
 								{
 									foreach($incomesRows as $incomeRow)
 									{
-										echo"<tr><td>{$incomeRow['date']}</td><td>{$incomeRow['transactionGroup']}</td><td>{$incomeRow['amount']} PLN</td><td>{$incomeRow['comment']}</td></tr>";
-										$totalIncomes+=$incomeRow['amount'];
+											$roundedIncAmount = round($incomeRow['totalAmount'], 2);
+											echo"<tr><td>{$incomeRow['transactionGroup']}</td><td>{$roundedIncAmount} PLN</td></tr>";
+											$totalIncomes+=$incomeRow['totalAmount'];
 									}
 								}
 								else
 								{
-									echo "<tr><td colspan='4'>there is no incomes</td></tr>";
+									echo "<tr><td colspan='2'>there is no incomes</td></tr>";
 								}
-								echo "<tr><th colspan='2' class='text-right'></th><th style='color: ForestGreen;'>$totalIncomes PLN</th></tr>"
+								$roundedTotalIncAmount = round($totalIncomes,2);
+								echo "<tr><th>total</th><th style='color: ForestGreen;'>$roundedTotalIncAmount PLN</th></tr>"
 								?>
 							</tbody>
 						</table>
 						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto border">
+						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto">
 							<thead>
-								<tr><th colspan="4" class="p-3 border border-bottom">running year Expenses</th></tr>
-								<tr><th>date</th><th>group</th><th>amount</th><th>comment</th></tr>
+								<tr><th colspan="2" class="p-3 border-bottom">running month Expenses</th></tr>
+								<tr><th>category</th><th>amount</th></tr>
 							</thead>
 							<tbody>
 								<?php
@@ -174,44 +176,44 @@ catch(Exception $e)
 								{
 									foreach($expensesRows as $expenseRow)
 									{
-										echo"<tr><td>{$expenseRow['date']}</td><td>{$expenseRow['transactionGroup']}</td><td>{$expenseRow['amount']} PLN</td><td>{$expenseRow['comment']}</td></tr>";
-										$totalExpenses+=$expenseRow['amount'];
+										$roundedExpAmount = round($expenseRow['totalAmount'],2);
+										echo"<tr><td>{$expenseRow['transactionGroup']}</td><td>{$roundedExpAmount} PLN</td></tr>";
+										$totalExpenses+=$expenseRow['totalAmount'];
 									}
 								}
 								else
 								{
-									echo "<tr><td colspan='4'>there is no expenses</td></tr>";
+									echo "<tr><td colspan='2'>there is no expenses</td></tr>";
 								}
-								echo "<tr><th colspan='2' class='text-right'></th><th style='color: FireBrick;'>$totalExpenses PLN</th></tr>";
+								$roundedTotalExpAmount = round($totalExpenses,2);
+								echo "<tr><th>total</th><th style='color: FireBrick;'>$roundedTotalExpAmount PLN</th></tr>";
 								?>
 							</tbody>
 						</table>
 						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto border">
+						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto ">
 							<thead>
 								<tr>
-									<th scope="col" colspan="2" class="p-3 border border-bottom">SUMMARY</th>
+									<th scope="col" colspan="2" class="p-3 border-bottom">SUMMARY</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
 									<th scope="row">total Incomes</th>
-									
 									<?php
-									
-									echo "<td style='color: ForestGreen;'>$totalIncomes PLN</td>";
+									echo "<td style='color: ForestGreen;'>$roundedTotalIncAmount PLN</td>";
 									?>
 								</tr>
 								<tr>
 									<th scope="row">total Expenses</th>
 									<?php
-									echo "<td style='color: FireBrick;'>$totalExpenses PLN</td>";
+									echo "<td style='color: FireBrick;'>$roundedTotalExpAmount PLN</td>";
 									?>
 								</tr>
 								<tr>
 									<th scope="row">Result</th>
 									<?php
-									$result = $totalIncomes-$totalExpenses;
+									$result = $roundedTotalIncAmount-$roundedTotalExpAmount;
 																		
 									echo "<td>$result PLN</td>";
 									?>
@@ -219,7 +221,7 @@ catch(Exception $e)
 							</tbody>
 						</table>
 						<hr>
-						<div class="p-3 border">
+						<div class="p-3">
 							<?php
 								if($result > 0)
 								{
