@@ -22,8 +22,10 @@ try
 		else
 		{
 			$id = $_SESSION['userId'];
+			if(isset($_POST['transactionsLimit']))	$limitNo = $_POST['transactionsLimit'];
+			else $limitNo = 5;
 			
-			$sql = "SELECT date, amount, transactionGroup, transactionType FROM transactions WHERE userId=$id ORDER BY id DESC LIMIT 5";
+			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id ORDER BY id DESC LIMIT $limitNo";
 			if($result = @$link->query($sql))
 			{
 				$transactionsQty = $result->num_rows;
@@ -109,6 +111,9 @@ catch(Exception $e)
 						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
 					</li>
 					<li class="navbar-item">
+						<a class="nav-link" href="budget.php"><i class="icon-user"></i> My account</a>
+					</li>
+					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
 					</li>
 				</ul>
@@ -134,18 +139,41 @@ catch(Exception $e)
 						</div>
 						<table class="table table-striped table-dark mt-5 mx-auto border">
 							<thead>
-								<tr><th colspan="4" class="p-3 border border-bottom">your last transactions </th></tr>
-								<tr><th>date</th><th>amount</th><th>group</th><th>type</th></tr>
+								<tr><th colspan="6" class="p-3 border border-bottom">your last transactions </th></tr>
+								<tr><th>date</th><th>amount</th><th>group</th><th>type</th><th>comment</th></tr>
 							</thead>
 							<tbody>
 								<?php
-								foreach($rows as $row)
+								if($transactionsQty>0)
 								{
-									echo"<tr><td>{$row['date']}</td><td>{$row['amount']}</td><td>{$row['transactionGroup']}</td><td>{$row['transactionType']}</td></tr>";
+									$no=0;
+									foreach($rows as $row)
+									{
+										$no++;
+										echo"<tr><th>$no</th><td>{$row['date']}</td><td>{$row['amount']}</td><td>{$row['transactionGroup']}</td><td>{$row['transactionType']}</td><td>{$row['comment']}</td></tr>";
+									}
+								}
+								else
+								{
+									echo "there is no transactions.";
 								}
 								?>
 							</tbody>
+							
 						</table>
+						<form id="transactionsLimit" method="post">
+							<span>do you want to see more or less transactions?</span>
+							<div class="form-group col-6 offset-3 my-3">
+								<input type="number" step="1" min="0" name="transactionsLimit" id="transactionsLimit" 
+								<?php 'value="' .$limitNo .'"'
+								  
+								 ?>
+								>
+							</div>
+							<div class="form-group p-3">
+									<input type="submit" style="width:50px" value="OK" class="col-4" >
+							</div>
+						</form>
 					</div>
 					
 					<aside class="col-lg-4">
