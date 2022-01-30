@@ -1,5 +1,78 @@
 <?php
 session_start();
+
+if(!isset($_SESSION['logged']))
+	{
+		header('Location: index.php');
+		exit();
+	}
+	
+require_once 'connect.php';
+
+mysqli_report(MYSQLI_REPORT_STRICT);
+
+
+if(isset($_POST['startBalanceDate']))
+{
+	unset($_SESSION['errorDate']);			
+
+	$st=$_POST['startBalanceDate'];
+	$en=$_POST['endBalanceDate'];
+	
+	if($st > $en)
+	{	
+		$_SESSION['errorDate'] = '<span style="color:red">Wrong range of dates!</span>';
+		header('Location: balanceSheet.php');
+	}
+	else
+	{
+		try
+			{
+				$link = @new mysqli($host, $db_user, $db_password, $db_name);
+
+				if($link->connect_errno!=0)
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+				else
+				{
+					$id = $_SESSION['userId'];
+					
+					$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND transactionType='Income' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
+										
+					if($result = @$link->query($sql))
+					{
+						$incomesQnty = $result->num_rows;
+						$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
+						$result->free_result();
+					}
+					else
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+					
+					$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND transactionType='Expense' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
+					
+					if($result = @$link->query($sql))
+					{
+						$expensesQnty = $result->num_rows;
+						$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
+						$result->free_result();
+					}
+					else
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+					$link->close();
+				}
+			}
+		catch(Exception $e)
+			{
+				echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
+				echo '<br />Dev info: '.$e;
+			}
+	}
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -62,24 +135,22 @@ session_start();
 				<div class="row mx-auto">
 						
 					<div class="balanceSheet col-lg-8 bg-dark border border-secondary rounded-right mt-5">
-						<h1 class="h3 col-12 mb-4">balance sheet</h1>
-						<form id="displayBalanceSheet">
-							<div class="form-group mx-auto">
-								<label for="selectPeriod">period of time</label>
-								</br>
-								<select  id="selectPeriod" onchange="checkPeriod(this)">
-									<option value="1"selected>running month</option>
-									<option value="2">previous month</option>
-									<option value="3">running year</option>
-									<option value="4">custom</option>
-								</select>
-							</div>
-							<div class="form-group col-6 offset-3" id="rowSelectDateVisible">
+						<form id="displayBalanceSheet" method="post">
+							<div class="form-group col-6 offset-3">
 								<legend>choose period of time</legend>
-								<label for="startBalanceDate" id="timePeriod" class="d-block">start date</label>
-								<input type="date" required id="startBalanceDate" min="" max="">
-								<label for="endBalanceDate" id="timePeriod" class="d-block">end date</label>
-								<input type="date" required id="endBalanceDate" min="" max="">
+								
+								<label for="startBalanceDate" id="timePeriod">start date</label>
+								<input type="date" class="form-control" required id="startBalanceDate" name="startBalanceDate" min="" max="">
+								<hr>
+								<label for="endBalanceDate" id="timePeriod">end date</label>
+								<input type="date" class="form-control" required id="endBalanceDate" name="endBalanceDate" min="" max="">
+								<?php
+									if(isset($_SESSION['errorDate'])) echo $_SESSION['errorDate'];
+								?>
+							</div>
+							<div class="form-group">
+								<input type="submit" value="check balance" class="d-inline-block col-4" >
+								<input type="reset" value="Cancel" class="d-inline-block col-4">
 							</div>
 						</form>
 						<hr>
@@ -96,26 +167,32 @@ session_start();
 										<th scope="col">total</th>
 									</tr>
 								</thead>
-								<tr>
-									<th scope="row">cat 1</th>
-									<td>total</td>
-								</tr>
-								<tr>
-									<th scope="row">cat 2</th>
-									<td>total</td>
-								</tr>
-								<tr>
-									<th scope="row">cat 3</th>
-									<td>total</td>
-								</tr>
-								<tr>
-									<th scope="row">cat 4</th>
-									<td>total</td>
-								</tr>
-								<tr class="bg-success">
-									<th scope="row">grand total</th>
-									<td> 1234 PLN </td>
-								</tr>
+								<tbody>
+								<?php
+								$totalIncomes=0;
+								if(isset($incomesQnty))
+								{
+									if($incomesQnty > 0)
+									{
+										
+										foreach($incomesRows as $incomeRow)
+										{
+											$roundedIncAmount = round($incomeRow['totalAmount'], 2);
+											echo "<tr><th scope='row'>{$incomeRow['transactionGroup']}</th><td>{$roundedIncAmount} PLN</td></tr>";
+											$totalIncomes+=$incomeRow['totalAmount'];
+										}
+									}
+									else
+									{
+										echo "<tr><td colspan='2'>there is no incomes</td></tr>";
+									}
+								
+								$roundedTotalIncAmount = round($totalIncomes,2);
+								echo "<tr class='bg-success'><th scope='row'>grand total</th><td>$roundedTotalIncAmount PLN</td>
+								</tr>"
+								}
+								?>
+								</tbody>
 							</table>
 						</div>
 						<hr>

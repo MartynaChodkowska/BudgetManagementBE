@@ -122,9 +122,9 @@ if(isset($_POST['amount']))
 								<textarea name="comment" id="comment" rows="3" class="col-12"></textarea>
 							</div>
 							<div class="form-group">
-								
 								<input type="submit" value="Add income" class="d-inline-block col-4" >
 								<input type="reset" value="Cancel" class="d-inline-block col-4">
+								
 							</div>
 						</form>
 					</div>

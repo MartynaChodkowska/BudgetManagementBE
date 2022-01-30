@@ -134,88 +134,100 @@ catch(Exception $e)
 	<main>	
 		<article>
 			<div class="container">
-				
 				<div class="row mt-5 mx-auto">
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-<table class="table table-sm table-striped table-dark table-hover mt-5 mx-auto">
-							<thead>
-								<tr><th colspan="2" class="p-3  border-bottom">running month Incomes</th></tr>
-								<tr><th>category</th><th>amount</th></tr>
+						<h4 class="mt-2"><strong>previous month balance sheet</strong></h4>
+						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto text-center">
+							<thead class="thead-dark">
+								<tr><th colspan="2" scope="col" class="p-2 text-success border-bottom">INCOMES</th></tr>
+								<tr><th scope="col">category</th><th scope="col">amount</th></tr>
 							</thead>
 							<tbody>
 								<?php
 								$totalIncomes=0;
-								if ($incomesQnty > 0)
+								if(isset($incomesQnty))
 								{
-									foreach($incomesRows as $incomeRow)
+									if ($incomesQnty > 0)
 									{
-											$roundedIncAmount = round($incomeRow['totalAmount'], 2);
-											echo"<tr><td>{$incomeRow['transactionGroup']}</td><td>{$roundedIncAmount} PLN</td></tr>";
-											$totalIncomes+=$incomeRow['totalAmount'];
+										foreach($incomesRows as $incomeRow)
+										{
+												$roundedIncAmount = round($incomeRow['totalAmount'], 2);
+												echo"<tr><td>{$incomeRow['transactionGroup']}</td><td>{$roundedIncAmount} PLN</td></tr>";
+												$totalIncomes+=$incomeRow['totalAmount'];
+										}
 									}
+									else
+									{
+										echo "<tr><td colspan='2'>there is no incomes</td></tr>";
+									}
+									$roundedTotalIncAmount = round($totalIncomes,2);
+									echo "<tr class='text-success'><th>total</th><th>$roundedTotalIncAmount PLN</th></tr>";
 								}
 								else
 								{
-									echo "<tr><td colspan='2'>there is no incomes</td></tr>";
+									echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
 								}
-								$roundedTotalIncAmount = round($totalIncomes,2);
-								echo "<tr><th>total</th><th style='color: ForestGreen;'>$roundedTotalIncAmount PLN</th></tr>"
 								?>
 							</tbody>
 						</table>
 						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto">
+						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto text-center">
 							<thead>
-								<tr><th colspan="2" class="p-3 border-bottom">running month Expenses</th></tr>
-								<tr><th>category</th><th>amount</th></tr>
+								<tr><th colspan="2" scope="col" class="p-2 text-danger border-bottom">EXPENSES</th></tr>
+								<tr><th scope="col">category</th><th scope="col">amount</th></tr>
 							</thead>
 							<tbody>
 								<?php
 								$totalExpenses=0;
-								if ($expensesQnty > 0)
+								if(isset($expensesQnty))
 								{
-									foreach($expensesRows as $expenseRow)
+									if ($expensesQnty > 0)
 									{
-										$roundedExpAmount = round($expenseRow['totalAmount'],2);
-										echo"<tr><td>{$expenseRow['transactionGroup']}</td><td>{$roundedExpAmount} PLN</td></tr>";
-										$totalExpenses+=$expenseRow['totalAmount'];
+										foreach($expensesRows as $expenseRow)
+										{
+											$roundedExpAmount = round($expenseRow['totalAmount'],2);
+											echo"<tr><td>{$expenseRow['transactionGroup']}</td><td>{$roundedExpAmount} PLN</td></tr>";
+											$totalExpenses+=$expenseRow['totalAmount'];
+										}
 									}
+									else
+									{
+										echo "<tr><td colspan='2'>there is no expenses</td></tr>";
+									}
+									$roundedTotalExpAmount = round($totalExpenses,2);
+									echo "<tr class='text-danger'><th>total</th><th>$roundedTotalExpAmount PLN</th></tr>";
 								}
 								else
 								{
-									echo "<tr><td colspan='2'>there is no expenses</td></tr>";
+									echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
 								}
-								$roundedTotalExpAmount = round($totalExpenses,2);
-								echo "<tr><th>total</th><th style='color: FireBrick;'>$roundedTotalExpAmount PLN</th></tr>";
 								?>
 							</tbody>
 						</table>
 						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto ">
+						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto text-center">
 							<thead>
-								<tr>
-									<th scope="col" colspan="2" class="p-3 border-bottom">SUMMARY</th>
-								</tr>
+								<tr><th scope="col" colspan="2" class="p-2 text-warning border-bottom">SUMMARY</th></tr>
 							</thead>
 							<tbody>
 								<tr>
-									<th scope="row">total Incomes</th>
+									<td scope="row">total Incomes</td>
 									<?php
-									echo "<td style='color: ForestGreen;'>$roundedTotalIncAmount PLN</td>";
+									echo "<td class='text-success'>$roundedTotalIncAmount PLN</td>";
 									?>
 								</tr>
 								<tr>
-									<th scope="row">total Expenses</th>
+									<td scope="row">total Expenses</td>
 									<?php
-									echo "<td style='color: FireBrick;'>$roundedTotalExpAmount PLN</td>";
+									echo "<td class='text-danger'>$roundedTotalExpAmount PLN</td>";
 									?>
 								</tr>
-								<tr>
+								<tr class="text-warning">
 									<th scope="row">Result</th>
 									<?php
 									$result = $roundedTotalIncAmount-$roundedTotalExpAmount;
 																		
-									echo "<td>$result PLN</td>";
+									echo "<th>$result PLN</th>";
 									?>
 								</tr>							
 							</tbody>
