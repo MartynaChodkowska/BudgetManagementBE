@@ -6,59 +6,72 @@ if(!isset($_SESSION['logged']))
 		header('Location: index.php');
 		exit();
 	}
-
+	
 require_once 'connect.php';
 
 mysqli_report(MYSQLI_REPORT_STRICT);
 
-try
-	{
-		$link = @new mysqli($host, $db_user, $db_password, $db_name);
 
-		if($link->connect_errno!=0)
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-		else
-		{
-			$id = $_SESSION['userId'];
-			
-			$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND (Month(date) =  Month(now())) AND (Year(date) =  Year(now())) AND transactionType='Income' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$incomesQnty = $result->num_rows;
-				$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND (Month(date) =  Month(now())) AND (Year(date) =  Year(now())) AND transactionType='Expense' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$expensesQnty = $result->num_rows;
-				$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			
-			
-			
-			$link->close();
-		}
-		
+if(isset($_POST['startBalanceDate']))
+{	
+
+	$st=$_POST['startBalanceDate'];
+	$en=$_POST['endBalanceDate'];
+	
+	if($st > $en)
+	{	
+		$_SESSION['errorDate'] = '<span style="color:red">Wrong range of dates!</span>';
+		header('Location: customDates.php');
 	}
-catch(Exception $e)
+	else
 	{
-		echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
-		echo '<br />Dev info: '.$e;
+		try
+			{
+				$link = @new mysqli($host, $db_user, $db_password, $db_name);
+
+				if($link->connect_errno!=0)
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+				else
+				{
+					$id = $_SESSION['userId'];
+					
+					$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND transactionType='Income' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
+										
+					if($result = @$link->query($sql))
+					{
+						$incomesQnty = $result->num_rows;
+						$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
+						$result->free_result();
+					}
+					else
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+					
+					$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND transactionType='Expense' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
+					
+					if($result = @$link->query($sql))
+					{
+						$expensesQnty = $result->num_rows;
+						$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
+						$result->free_result();
+					}
+					else
+					{
+						throw new Exception(mysqli_connect_errno());
+					}
+					$link->close();
+				}
+			}
+		catch(Exception $e)
+			{
+				echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
+				echo '<br />Dev info: '.$e;
+			}
 	}
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -93,36 +106,20 @@ catch(Exception $e)
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
-				<?php
-				if(isset($_SESSION['login'])) 
-				{
-					echo "Nice to see you, ".$_SESSION['login']."!";
-				}
-				else 
-				{
-					echo "art of finance";
-				}
-				?>
-			</a>
+			<a class="navbar-brand" href="#"><img src="img/pigybank1.jpg" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">feed the piggy</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			
-					
 			<div class="collapse navbar-collapse" id="mainmenu">
 				<ul class="navbar-nav ml-auto">
-					
 					<li class="navbar-item">
 						<a class="nav-link" href="index.php"><i class="icon-home"></i> Home</a>
 					</li>
 					<li class="navbar-item">
-						<a class="nav-link" href="budget.php"><i class="icon-user"></i>My account</a>
-					</li>					
-					<li class="navbar-item">
 						<a class="nav-link" href="logout.php"><i class="icon-logout"></i> Sign out</a>
-					</li>
+					</li>					
 					<li class="navbar-item">
 						<a class="nav-link" href="#"><i class="icon-cog"></i> Settings</a>
 					</li>
@@ -134,10 +131,13 @@ catch(Exception $e)
 	<main>	
 		<article>
 			<div class="container">
-				
-				<div class="row mt-5 mx-auto">
-					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-						<h4 class="mt-2"><strong>running month balance sheet</strong></h4>
+				<div class="row mx-auto">
+						
+					<div class="balanceSheet col-lg-8 bg-dark border border-secondary rounded-right mt-5">
+						<?php
+						echo '<h4 class="mt-2"><strong>balance sheet between '.$st.' and '.$en.'</strong></h4>';
+						
+						?>
 						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto text-center">
 							<thead class="thead-dark">
 								<tr><th colspan="2" scope="col" class="p-2 text-success border-bottom">INCOMES</th></tr>
@@ -262,11 +262,11 @@ catch(Exception $e)
 						</ul>
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
-							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action active">running month</a>
+							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
 							<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
-							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
+							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action ">running year</a>
 							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
-							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action">custom dates</a>
+							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action active">custom dates</a>
 						</ul>
 						<h5 class="mt-5">Categories manager</h5>
 						<ul>

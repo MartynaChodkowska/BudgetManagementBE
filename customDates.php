@@ -6,59 +6,9 @@ if(!isset($_SESSION['logged']))
 		header('Location: index.php');
 		exit();
 	}
+
+unset($_SESSION['errorDate']);
 	
-require_once 'connect.php';
-
-mysqli_report(MYSQLI_REPORT_STRICT);
-
-try
-	{
-		$link = @new mysqli($host, $db_user, $db_password, $db_name);
-
-		if($link->connect_errno!=0)
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-		else
-		{
-			$id = $_SESSION['userId'];
-			
-			$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now()) AND transactionType='Income' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$incomesQnty = $result->num_rows;
-				$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now()) AND transactionType='Expense' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$expensesQnty = $result->num_rows;
-				$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			
-			
-			
-			$link->close();
-		}
-		
-	}
-catch(Exception $e)
-	{
-		echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
-		echo '<br />Dev info: '.$e;
-	}
 ?>
 
 <!DOCTYPE HTML>
@@ -137,132 +87,52 @@ catch(Exception $e)
 				
 				<div class="row mt-5 mx-auto">
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
-						<table class="table table-sm table-striped table-dark table-hover mt-5 mx-auto">
-							<thead>
-								<tr><th colspan="2" class="p-3  border-bottom">running month Incomes</th></tr>
-								<tr><th>category</th><th>amount</th></tr>
-							</thead>
-							<tbody>
-								<?php
-								$totalIncomes=0;
-								if ($incomesQnty > 0)
-								{
-									foreach($incomesRows as $incomeRow)
-									{
-											$roundedIncAmount = round($incomeRow['totalAmount'], 2);
-											echo"<tr><td>{$incomeRow['transactionGroup']}</td><td>{$roundedIncAmount} PLN</td></tr>";
-											$totalIncomes+=$incomeRow['totalAmount'];
-									}
-								}
-								else
-								{
-									echo "<tr><td colspan='2'>there is no incomes</td></tr>";
-								}
-								$roundedTotalIncAmount = round($totalIncomes,2);
-								echo "<tr><th>total</th><th style='color: ForestGreen;'>$roundedTotalIncAmount PLN</th></tr>"
-								?>
-							</tbody>
-						</table>
-						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto">
-							<thead>
-								<tr><th colspan="2" class="p-3 border-bottom">running month Expenses</th></tr>
-								<tr><th>category</th><th>amount</th></tr>
-							</thead>
-							<tbody>
-								<?php
-								$totalExpenses=0;
-								if ($expensesQnty > 0)
-								{
-									foreach($expensesRows as $expenseRow)
-									{
-										$roundedExpAmount = round($expenseRow['totalAmount'],2);
-										echo"<tr><td>{$expenseRow['transactionGroup']}</td><td>{$roundedExpAmount} PLN</td></tr>";
-										$totalExpenses+=$expenseRow['totalAmount'];
-									}
-								}
-								else
-								{
-									echo "<tr><td colspan='2'>there is no expenses</td></tr>";
-								}
-								$roundedTotalExpAmount = round($totalExpenses,2);
-								echo "<tr><th>total</th><th style='color: FireBrick;'>$roundedTotalExpAmount PLN</th></tr>";
-								?>
-							</tbody>
-						</table>
-						<hr>
-						<table class="table table-sm table-striped table-dark table-hover mt-3 mx-auto ">
-							<thead>
-								<tr>
-									<th scope="col" colspan="2" class="p-3 border-bottom">SUMMARY</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<th scope="row">total Incomes</th>
-									<?php
-									echo "<td style='color: ForestGreen;'>$roundedTotalIncAmount PLN</td>";
-									?>
-								</tr>
-								<tr>
-									<th scope="row">total Expenses</th>
-									<?php
-									echo "<td style='color: FireBrick;'>$roundedTotalExpAmount PLN</td>";
-									?>
-								</tr>
-								<tr>
-									<th scope="row">Result</th>
-									<?php
-									$result = $roundedTotalIncAmount-$roundedTotalExpAmount;
-																		
-									echo "<td>$result PLN</td>";
-									?>
-								</tr>							
-							</tbody>
-						</table>
-						<hr>
-						<div class="p-3">
+						<form id="displayBalanceSheet" method="post" action="customBalanceSheet.php">
+						<div class="form-group col-6 offset-3">
+							<legend class="my-3">choose period of time</legend>
+							
+							<label for="startBalanceDate" id="timePeriod">start date</label>
+							<input type="date" class="form-control" required id="startBalanceDate" name="startBalanceDate" min="" max="">
+							<hr>
+							<label for="endBalanceDate" id="timePeriod">end date</label>
+							<input type="date" class="form-control" required id="endBalanceDate" name="endBalanceDate" min="" max="">
 							<?php
-								if($result > 0)
-								{
-									echo "<h1 style='color: ForestGreen; font-weight: 900;'>You are doing great job!</h1>";
-								}
-								else if($result < 0)
-								{
-									echo "<h1 style='color: FireBrick; font-weight: 900;'>Whoaa slow down with your expenses..</h1>";
-								}
-								else
-								{
-									echo "<h1 style='color: gold; font-weight: 900;'>well... could be worse, but still - try to make an effort to make some savings</h1>";
-								}
+								if(isset($_SESSION['errorDate'])) echo $_SESSION['errorDate'];
 							?>
 						</div>
-						</br></br>
+						<div class="form-group p-5">
+							<input type="submit" value="check balance" class="d-inline-block col-4" >
+							<input type="reset" value="cancel" class="d-inline-block col-4">
+						</div>
+					</form>
+						
+						
 					</div>
+					</br></br>
+				
 					
-					<aside class="col-lg-4">
-						<h5>Transactions review</h5>
-						<ul>
-							<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
-							<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
-							<a href="lastTransactions.php" class="list-group-item list-group-item-dark list-group-item-action">last transactions</a>
-						</ul>
-						<h5 class="mt-5">Balance sheets review</h5>
-						<ul>
-							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
-							<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
-							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action active">running year</a>
-							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
-							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action">custom dates</a>
-						</ul>
-						<h5 class="mt-5">Categories manager</h5>
-						<ul>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">categories review</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add category</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">delete category</a>
-						</ul>
-					</aside>
-							
+				<aside class="col-lg-4">
+					<h5>Transactions review</h5>
+					<ul>
+						<a href="addIncome.php" class="list-group-item list-group-item-dark list-group-item-action">add income</a>
+						<a href="addExpense.php" class="list-group-item list-group-item-dark list-group-item-action">add expense</a>
+						<a href="lastTransactions.php" class="list-group-item list-group-item-dark list-group-item-action">last transactions</a>
+					</ul>
+					<h5 class="mt-5">Balance sheets review</h5>
+					<ul>
+						<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
+						<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
+						<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
+						<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+						<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action active">custom dates</a>
+					</ul>
+					<h5 class="mt-5">Categories manager</h5>
+					<ul>
+						<a href="#" class="list-group-item list-group-item-dark list-group-item-action">categories review</a>
+						<a href="#" class="list-group-item list-group-item-dark list-group-item-action">add category</a>
+						<a href="#" class="list-group-item list-group-item-dark list-group-item-action">delete category</a>
+					</ul>
+				</aside>
 				</div>
 			</div>
 		</article>
