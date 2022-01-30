@@ -67,6 +67,11 @@ p
 	font-weight: 400;
 }
 
+a
+{
+	color: #808080;
+}
+
 input[type="text"],
 input[type="password"],
 input[type="date"],
@@ -148,7 +153,34 @@ input[type="reset"]:hover
 {
 	background-color: #E27333;
 }
-	
+
+input[type="button"]
+{
+	background-color: white;
+	opacity: 0.8;
+	color: maroon;
+	border: 2px solid maroon;
+	border-radius: 5px;
+	padding: 7px;
+	box-sizing: border-box;
+	outline: none;
+}
+
+input[type="button"]:hover
+{
+	background-color: FireBrick;
+}
+
+input[type="button"]:focus
+{
+	-webkit-box-shadow: 3px 3px 5px 2px rgba(172,212,182,1);
+	-moz-box-shadow: 3px 3px 5px 2px rgba(172,212,182,1);
+	box-shadow: 3px 3px 5px 2px rgba(172,212,182,1);
+	border: 2px solid #3A6C47;
+}
+
+
+
 #comment
 {
 	resize: none;
