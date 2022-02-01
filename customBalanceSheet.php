@@ -7,10 +7,7 @@ if(!isset($_SESSION['logged']))
 		exit();
 	}
 	
-require_once 'connect.php';
-
-mysqli_report(MYSQLI_REPORT_STRICT);
-
+require_once 'database.php';
 
 if(isset($_POST['startBalanceDate']))
 {	
@@ -27,48 +24,42 @@ if(isset($_POST['startBalanceDate']))
 	{
 		try
 			{
-				$link = @new mysqli($host, $db_user, $db_password, $db_name);
-
-				if($link->connect_errno!=0)
-					{
-						throw new Exception(mysqli_connect_errno());
-					}
+				$id = $_SESSION['userId'];
+					
+				$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId= :userId AND transactionType='Income' AND (date BETWEEN :start AND :end) GROUP BY transactionGroup ORDER BY totalAmount DESC";
+				$incomesQuery = $db->prepare($sql);
+				$incomesQuery->bindValue(':userId', $id, PDO::PARAM_STR);
+				$incomesQuery->bindValue(':start', $st, PDO::PARAM_STR);
+				$incomesQuery->bindValue(':end', $en, PDO::PARAM_STR);
+				if($incomesQuery->execute())
+				{
+					$incomesQnty = $incomesQuery->rowCount();
+					$incomesRows = $incomesQuery->fetchAll();
+				}
 				else
 				{
-					$id = $_SESSION['userId'];
-					
-					$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND transactionType='Income' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
-										
-					if($result = @$link->query($sql))
-					{
-						$incomesQnty = $result->num_rows;
-						$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
-						$result->free_result();
-					}
-					else
-					{
-						throw new Exception(mysqli_connect_errno());
-					}
-					
-					$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId=$id AND transactionType='Expense' AND (date BETWEEN '$st' AND '$en') GROUP BY transactionGroup ORDER BY totalAmount DESC";
-					
-					if($result = @$link->query($sql))
-					{
-						$expensesQnty = $result->num_rows;
-						$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
-						$result->free_result();
-					}
-					else
-					{
-						throw new Exception(mysqli_connect_errno());
-					}
-					$link->close();
+					throw new Exception('Database error. We are really sorry! Try again later..');
+				}
+				
+				$sql = "SELECT transactionGroup, SUM(amount) as totalAmount FROM transactions WHERE userId= :userId AND transactionType='Expense' AND (date BETWEEN :start AND :end) GROUP BY transactionGroup ORDER BY totalAmount DESC";
+				$expensesQuery = $db->prepare($sql);
+				$expensesQuery->bindValue(':userId', $id, PDO::PARAM_STR);
+				$expensesQuery->bindParam(':start', $st, PDO::PARAM_STR);
+				$expensesQuery->bindParam(':end', $en, PDO::PARAM_STR);
+				if($expensesQuery->execute())
+				{
+					$expensesQnty = $expensesQuery->rowCount();
+					$expensesRows = $expensesQuery->fetchAll();	
+				}
+				else
+				{
+					throw new Exception('Database error. We are really sorry! Try again later..');
 				}
 			}
 		catch(Exception $e)
 			{
 				echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
-				echo '<br />Dev info: '.$e;
+				//echo '<br />Dev info: '.$e;
 			}
 	}
 }
@@ -106,7 +97,18 @@ if(isset($_POST['startBalanceDate']))
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="#"><img src="img/pigybank1.jpg" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">feed the piggy</a>
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
+				<?php
+				if(isset($_SESSION['login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
@@ -159,7 +161,7 @@ if(isset($_POST['startBalanceDate']))
 									}
 									else
 									{
-										echo "<tr><td colspan='2'>there is no incomes</td></tr>";
+										echo "<tr><td colspan='2'>there are no incomes</td></tr>";
 									}
 									$roundedTotalIncAmount = round($totalIncomes,2);
 									echo "<tr class='text-success'><th>total</th><th>$roundedTotalIncAmount PLN</th></tr>";
@@ -193,7 +195,7 @@ if(isset($_POST['startBalanceDate']))
 									}
 									else
 									{
-										echo "<tr><td colspan='2'>there is no expenses</td></tr>";
+										echo "<tr><td colspan='2'>there are no expenses</td></tr>";
 									}
 									$roundedTotalExpAmount = round($totalExpenses,2);
 									echo "<tr class='text-danger'><th>total</th><th>$roundedTotalExpAmount PLN</th></tr>";
@@ -236,18 +238,25 @@ if(isset($_POST['startBalanceDate']))
 						<hr>
 						<div class="p-3">
 							<?php
+							if($incomesQnty!=0 OR $expensesQnty!=0)
+							{
 								if($result > 0)
 								{
 									echo "<h1 style='color: ForestGreen; font-weight: 900;'>You are doing great job!</h1>";
 								}
 								else if($result < 0)
 								{
-									echo "<h1 style='color: FireBrick; font-weight: 900;'>Whoaa slow down with your expenses..</h1>";
+									echo "<h1 style='color: FireBrick; font-weight: 900;'>Whoaa! Slow down with your expenses..</h1>";
 								}
 								else
 								{
 									echo "<h1 style='color: gold; font-weight: 900;'>well... could be worse, but still - try to make an effort to make some savings</h1>";
 								}
+							}
+							else
+							{
+								echo "there are no transactions";
+							}
 							?>
 						</div>
 						</br></br>

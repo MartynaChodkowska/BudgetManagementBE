@@ -1,6 +1,6 @@
 <?php
 
-$config = require_once('connect.php');
+$config = require_once('connectPDO.php');
 
 try
 {

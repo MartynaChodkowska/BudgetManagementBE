@@ -18,7 +18,7 @@ if(isset($_POST['amount']))
 	$_SESSION['comment']=$_POST['comment'];
 	$_SESSION['type']='Expense';
 	
-	header('Location: try.php');
+	header('Location: addTransaction.php');
 }
 
 ?>

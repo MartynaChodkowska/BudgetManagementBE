@@ -83,6 +83,13 @@ if (isset($_SESSION['logged']))
 				</header>
 				
 				<div class="intro col-sm-12">
+				 <?php
+				 if(isset($_SESSION['regiOK']))
+				 {
+					 echo "<h2 style='color: gold;'>Thank you for registration! Now you can sign in!</h2>";
+					 unset($_SESSION['regiOK']);
+				 }
+				 ?>
 					<div class="card-deck">
 						<div class="card col-xs-12 col-lg-6 bg-piggy">
 							<img class="card-img-top my-2"  src="img/messyhead.png" alt="">

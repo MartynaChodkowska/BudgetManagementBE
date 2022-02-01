@@ -54,17 +54,6 @@ session_start();
 				$_SESSION['e_secondname'] = "Second name has to contain only characters (no special characters).";
 			}
 			
-			/*
-			//email validation
-			$email = $_POST['email'];
-			$emailB = filter_var($email, FILTER_SANITIZE_EMAIL);//usuwa niealfanumeryczne znaki 
-			
-			if((filter_var($emailB, FILTER_VALIDATE_EMAIL)==false) || $emailB!=$email)
-			{
-				$allOK = false;
-				$_SESSION['e_email']="Put correct email address.";
-			}
-			*/
 			//passwords validation
 			$pass1=$_POST['password'];
 			$pass2=$_POST['confirmPassword'];
@@ -106,53 +95,47 @@ session_start();
 			}
 			
 			//check if login does not already exist
-			require_once "connect.php";
+			require_once "database.php";
 			
 			mysqli_report(MYSQLI_REPORT_STRICT);
 			
 			try
 			{
-				$connection = new mysqli($host, $db_user, $db_password, $db_name);
-				if($connection->connect_errno!=0)
+				$usersQuery = $db->prepare('SELECT userId FROM users WHERE login = :login');
+				$usersQuery->bindValue(':login', $login, PDO::PARAM_STR);
+				$usersQuery->execute();
+				
+				$howManyLogins = $usersQuery->rowCount();
+				
+				if($howManyLogins>0)
 				{
-					throw new Exception(mysqli_connect_errno());
+					$allOK = false;
+					$_SESSION['e_login']="There is an account with this login.";
 				}
-				else
-				{
-					//if login already exists
-					$result = $connection->query("SELECT userId FROM users WHERE login='$login'");
-					if(!$result) throw new Exception($connection->error);
-					$howManyLogins = $result->num_rows;
 					
-					if($howManyLogins>0)
+				else if($allOK == true)
+				{
+					//adding user to database
+					$insertUser = $db->prepare("INSERT INTO users VALUES(NULL, '$login', '$pass_hash', '$fname', '$sname')");
+					
+					
+					if($insertUser->execute())
 					{
-						$allOK = false;
-						$_SESSION['e_login']="There is an account with this login.";
+						$_SESSION['regiOK']=true;
+						header('Location: budget.php');
+					}
+					else
+					{
+						throw new Exception($usersQuery->error);
 					}
 					
-					if($allOK == true)
-					{
-						//adding user to database
-						if($connection->query("INSERT INTO users 
-						VALUES(NULL, '$login', '$pass_hash', '$fname', '$sname')"))
-						{
-							$_SESSION['regiOK']=true;
-							header('Location: welcome.php');
-						}
-						else
-						{
-							throw new Exception($connection->error);
-						}
-						
-					}
-					
-					$connection->close();
 				}
+				
 			}
 			catch(Exception $e)
 			{
 				echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
-				echo '<br />Dev info: '.$e;
+				//echo '<br />Dev info: '.$e;
 			}
 		}
 ?>
@@ -192,9 +175,9 @@ session_start();
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
 			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
 				<?php
-				if(isset($_SESSION['login'])) 
+				if(isset($_SESSION['given_login'])) 
 				{
-					echo "Nice to see you, ".$_SESSION['login']."!";
+					echo "Nice to see you, ".$_SESSION['given_login']."!";
 				}
 				else 
 				{

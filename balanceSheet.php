@@ -188,8 +188,7 @@ if(isset($_POST['startBalanceDate']))
 									}
 								
 								$roundedTotalIncAmount = round($totalIncomes,2);
-								echo "<tr class='bg-success'><th scope='row'>grand total</th><td>$roundedTotalIncAmount PLN</td>
-								</tr>"
+								echo "<tr class='bg-success'><th scope='row'>grand total</th><td>$roundedTotalIncAmount PLN</td></tr>";
 								}
 								?>
 								</tbody>
