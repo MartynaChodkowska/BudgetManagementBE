@@ -1,10 +1,10 @@
 <?php
 session_start();
-/*
+
 if (isset($_SESSION['logged'])) 
 {
 	header('Location: budget.php');
-}*/
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -83,7 +83,14 @@ if (isset($_SESSION['logged']))
 					<hr>
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="userName">User name</label>
-						<input type="text" class="form-control d-block" name="login" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'">
+						<input type="text" class="form-control d-block" name="login" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'"
+						<?php 
+						if(isset($_SESSION['given_login']))
+						{	
+							'value="' .$_SESSION['given_login'] .'"';
+						}
+						?>
+						>
 					</div>
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="password">Password</label>
@@ -98,7 +105,11 @@ if (isset($_SESSION['logged']))
 			</div>
 			<?php
 
-				if(isset($_SESSION['blad'])) echo $_SESSION['blad'];
+				if(isset($_SESSION['blad']))
+				{
+					echo'<p style="color: red">wrong login or password</p>';
+					unset ($_SESSION['blad']);
+				}
 			?>
 		</section>
 	</main>	

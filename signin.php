@@ -2,63 +2,49 @@
 
 	session_start();
 	
-	if((!isset($_POST['login'])) || (!isset($_POST['password'])))
-	{
-		header('Location: index.php');
-		exit();
-	}
+	require_once "database.php";
 	
-	require_once "connect.php";
-
-	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
-	
-	if($connection->connect_errno!=0)
+	if(!isset($_SESSION['logged']))
 	{
-		echo "Error".$connection->connect_errno;
-	}
-	else
-	{
-		$login = $_POST['login'];
-		$password = $_POST['password'];
-		
-		$login = htmlentities($login, ENT_QUOTES, "UTF-8");
-		
-		if ($result = @$connection->query(
-		sprintf("SELECT * FROM users WHERE login='%s'",
-		mysqli_real_escape_string($connection,$login))))
+		if(isset($_POST['login']))
 		{
-			$users_cnt = $result->num_rows;
+			$login = filter_input(INPUT_POST, 'login');
+			$password = filter_input(INPUT_POST, 'password');
+			$_SESSION['given_login'] = $_POST['login'];
 			
-			if($users_cnt>0)
+			$userQuery = $db->prepare('SELECT userId, password, name FROM users WHERE login= :login');
+			$userQuery->bindValue(':login', $login, PDO::PARAM_STR);
+			$userQuery->execute();
+			
+			$user = $userQuery->fetch();
+			
+			if($user && password_verify($password, $user['password']))
 			{
-				$row = $result->fetch_assoc();
+				$_SESSION['logged'] = true;	
 				
-				
-				if(password_verify($password, $row['password']))
-				{
-					$_SESSION['logged'] = true;
-										
-					$_SESSION['userId'] = $row['userId'];
-					$_SESSION['login'] = $row['login'];
-					$_SESSION['password'] = $row['password'];
-					$_SESSION['name'] = $row['name'];
-					$_SESSION['secondname'] = $row['secondname'];
-					
-					unset($_SESSION['blad']);
-					$result->free_result();
-					header('Location: budget.php');
-				}
-				else
-				{
-					$_SESSION['blad'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
-					header('Location: login.php');
-				}
-			}else{
-				
-				$_SESSION['blad'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
+				$_SESSION['userId'] = $user['userId'];
+				$_SESSION['login'] = $user['login'];
+				$_SESSION['password'] = $user['password'];
+				$_SESSION['name'] = $user['name'];
+
+				unset($_SESSION['blad']);
+				header('Location: budget.php');
+			}
+			else
+			{
+				$_SESSION['blad'] = true;
 				header('Location: login.php');
+				exit();
 			}
 		}
-		
-		$connection->close();
+		else
+		{
+			header('Location: login.php');
+			exit();
+		}
 	}
+	else
+		{
+			header('Location: login.php');
+			exit();
+		}

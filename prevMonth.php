@@ -7,57 +7,45 @@ if(!isset($_SESSION['logged']))
 		exit();
 	}
 
-require_once 'connect.php';
+require_once 'database.php';
 
-mysqli_report(MYSQLI_REPORT_STRICT);
 
 try
 	{
-		$link = @new mysqli($host, $db_user, $db_password, $db_name);
-
-		if($link->connect_errno!=0)
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
+		$id = $_SESSION['userId'];
+		
+		$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId= :userId AND YEAR(date) = YEAR(now() - INTERVAL 1 MONTH) AND MONTH(date) = MONTH(now() - INTERVAL 1 MONTH) AND transactionType='Income' GROUP BY transactionGroup ORDER BY totalAmount DESC";
+		$incomesQuery = $db->prepare($sql);
+		$incomesQuery->bindValue(':userId', $id, PDO::PARAM_STR);
+		if($incomesQuery->execute())
+		{
+			$incomesQnty = $incomesQuery->rowCount();
+			$incomesRows = $incomesQuery->fetchAll();
+		}
 		else
 		{
-			$id = $_SESSION['userId'];
-			
-			$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 MONTH) AND MONTH(date) = MONTH(now() - INTERVAL 1 MONTH) AND transactionType='Income' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$incomesQnty = $result->num_rows;
-				$incomesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId=$id AND YEAR(date) = YEAR(now() - INTERVAL 1 MONTH) AND MONTH(date) = MONTH(now() - INTERVAL 1 MONTH) AND transactionType='Expense' GROUP BY transactionGroup ORDER BY totalAmount DESC";
-			if($result = @$link->query($sql))
-			{
-				$expensesQnty = $result->num_rows;
-				$expensesRows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			
-			
-			
-			$link->close();
+			throw new Exception('Database error. We are really sorry! Try again later..');
 		}
+			
+		$sql = "SELECT transactionGroup, SUM(amount) AS totalAmount FROM transactions WHERE userId= :userId AND YEAR(date) = YEAR(now() - INTERVAL 1 MONTH) AND MONTH(date) = MONTH(now() - INTERVAL 1 MONTH) AND transactionType='Expense' GROUP BY transactionGroup ORDER BY totalAmount DESC";
+		$expensesQuery = $db->prepare($sql);
+		$expensesQuery->bindValue(':userId', $id, PDO::PARAM_STR);
+		if($expensesQuery->execute())
+		{
+			$expensesQnty = $expensesQuery->rowCount();
+			$expensesRows = $expensesQuery->fetchAll();	
+		}
+		else
+		{
+			throw new Exception('Database error. We are really sorry! Try again later..');
+		}	
+	
 		
 	}
 catch(Exception $e)
 	{
 		echo '<span class="error"> Server error! We apologize for the inconvenience. Please try again later.</span>';
-		echo '<br />Dev info: '.$e;
+		//echo '<br />Dev info: '.$e;
 	}
 ?>
 
@@ -158,7 +146,7 @@ catch(Exception $e)
 									}
 									else
 									{
-										echo "<tr><td colspan='2'>there is no incomes</td></tr>";
+										echo "<tr><td colspan='2'>there are no incomes</td></tr>";
 									}
 									$roundedTotalIncAmount = round($totalIncomes,2);
 									echo "<tr class='text-success'><th>total</th><th>$roundedTotalIncAmount PLN</th></tr>";
@@ -192,7 +180,7 @@ catch(Exception $e)
 									}
 									else
 									{
-										echo "<tr><td colspan='2'>there is no expenses</td></tr>";
+										echo "<tr><td colspan='2'>there are no expenses</td></tr>";
 									}
 									$roundedTotalExpAmount = round($totalExpenses,2);
 									echo "<tr class='text-danger'><th>total</th><th>$roundedTotalExpAmount PLN</th></tr>";
@@ -235,18 +223,25 @@ catch(Exception $e)
 						<hr>
 						<div class="p-3">
 							<?php
+							if($incomesQnty!=0 OR $expensesQnty!=0)
+							{
 								if($result > 0)
 								{
 									echo "<h1 style='color: ForestGreen; font-weight: 900;'>You are doing great job!</h1>";
 								}
 								else if($result < 0)
 								{
-									echo "<h1 style='color: FireBrick; font-weight: 900;'>Whoaa slow down with your expenses..</h1>";
+									echo "<h1 style='color: FireBrick; font-weight: 900;'>Whoaa! Slow down with your expenses..</h1>";
 								}
 								else
 								{
 									echo "<h1 style='color: gold; font-weight: 900;'>well... could be worse, but still - try to make an effort to make some savings</h1>";
 								}
+							}
+							else
+							{
+								echo "there are no transactions";
+							}
 							?>
 						</div>
 						</br></br>

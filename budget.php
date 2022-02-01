@@ -40,7 +40,18 @@
 <body>
 	<header>
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
-			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">Nice to see you, <?= $_SESSION['login']?>!</a>
+			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
+			<?php
+				if(isset($_SESSION['given_login'])) 
+				{
+					echo "Nice to see you, ".$_SESSION['given_login']."!";
+				}
+				else 
+				{
+					echo "art of finance";
+				}
+				?>
+			</a>
 		
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="navigation switcher">
 				<span class="navbar-toggler-icon"></span>
@@ -72,7 +83,7 @@
 					
 					<div class="buttons col-lg-8 bg-dark border border-secondary rounded-right">
 						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<a href="addincome.php">
+							<a href="addIncome.php">
 							<div class="icon">A</div>add income
 							</a>
 						</button>
@@ -82,7 +93,7 @@
 							</a>
 						</button>
 						<button type="button" class="btn btn-outline-secondary col-sm-8 col-lg-4 m-4">
-							<a href="balanceSheet.php">
+							<a href="customDates.php">
 							<div class="icon">k</div>display balance sheet
 							</a>
 						</button>

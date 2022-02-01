@@ -140,7 +140,7 @@ catch(Exception $e)
 						<table class="table table-striped table-dark mt-5 mx-auto border">
 							<thead>
 								<tr><th colspan="6" class="p-3 border border-bottom">your last transactions </th></tr>
-								<tr><th>date</th><th>amount</th><th>group</th><th>type</th><th>comment</th></tr>
+								<tr><th>no.</th><th>date</th><th>amount</th><th>group</th><th>type</th><th>comment</th></tr>
 							</thead>
 							<tbody>
 								<?php
@@ -186,9 +186,10 @@ catch(Exception $e)
 						<h5 class="mt-5">Balance sheets review</h5>
 						<ul>
 							<a href="currentMonth.php" class="list-group-item list-group-item-dark list-group-item-action">running month</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">running year</a>
-							<a href="#" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+							<a href="prevMonth.php" class="list-group-item list-group-item-dark list-group-item-action">previous month</a>
+							<a href="currentYear.php" class="list-group-item list-group-item-dark list-group-item-action ">running year</a>
+							<a href="prevYear.php" class="list-group-item list-group-item-dark list-group-item-action">previous year</a>
+							<a href="customDates.php" class="list-group-item list-group-item-dark list-group-item-action">custom dates</a>
 						</ul>
 						<h5 class="mt-5">Categories manager</h5>
 						<ul>
