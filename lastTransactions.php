@@ -7,42 +7,26 @@ if(!isset($_SESSION['logged']))
 	exit();
 }
 
-require_once 'connect.php';
-
-mysqli_report(MYSQLI_REPORT_STRICT);
+require_once 'database.php';
 
 try
 	{
-		$link = @new mysqli($host, $db_user, $db_password, $db_name);
-
-		if($link->connect_errno!=0)
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
+		$id = $_SESSION['userId'];
+		
+		if(isset($_POST['transactionsLimit']))	$limitNo = $_POST['transactionsLimit'];
+		else $limitNo = 5;
+		
+		$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id ORDER BY id DESC LIMIT $limitNo";
+		$transactionsQuery=$db->prepare($sql);
+		if($transactionsQuery->execute())
+		{
+			$transactionsQty = $transactionsQuery->rowCount();
+			$rows = $transactionsQuery->fetchAll();
+		}
 		else
 		{
-			$id = $_SESSION['userId'];
-			if(isset($_POST['transactionsLimit']))	$limitNo = $_POST['transactionsLimit'];
-			else $limitNo = 5;
-			
-			$sql = "SELECT date, amount, transactionGroup, transactionType, comment FROM transactions WHERE userId=$id ORDER BY id DESC LIMIT $limitNo";
-			if($result = @$link->query($sql))
-			{
-				$transactionsQty = $result->num_rows;
-				$rows = $result->fetch_all(MYSQLI_ASSOC);
-				$result->free_result();
-			}
-			
-			
-			else
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			
-			
-			$link->close();
-		}
-		
+			throw new Exception('Database error. We are really sorry! Try again later..');
+		}	
 	}
 catch(Exception $e)
 	{
@@ -85,9 +69,9 @@ catch(Exception $e)
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
 			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
 				<?php
-				if(isset($_SESSION['login'])) 
+				if(isset($_SESSION['name'])) 
 				{
-					echo "Nice to see you, ".$_SESSION['login']."!";
+					echo "Nice to see you, ".$_SESSION['name']."!";
 				}
 				else 
 				{

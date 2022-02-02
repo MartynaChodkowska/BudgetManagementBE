@@ -6,14 +6,14 @@
 	
 	if(!isset($_SESSION['logged']))
 	{
-		if(isset($_POST['login']))
+		if(isset($_POST['email']))
 		{
-			$login = filter_input(INPUT_POST, 'login');
+			$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 			$password = filter_input(INPUT_POST, 'password');
-			$_SESSION['given_login'] = $_POST['login'];
+			$_SESSION['given_email'] = $_POST['email'];
 			
-			$userQuery = $db->prepare('SELECT userId, password, name FROM users WHERE login= :login');
-			$userQuery->bindValue(':login', $login, PDO::PARAM_STR);
+			$userQuery = $db->prepare('SELECT userId, password, name FROM users WHERE email= :email');
+			$userQuery->bindValue(':email', $email, PDO::PARAM_STR);
 			$userQuery->execute();
 			
 			$user = $userQuery->fetch();
@@ -23,7 +23,7 @@
 				$_SESSION['logged'] = true;	
 				
 				$_SESSION['userId'] = $user['userId'];
-				$_SESSION['login'] = $user['login'];
+				$_SESSION['email'] = $user['email'];
 				$_SESSION['password'] = $user['password'];
 				$_SESSION['name'] = $user['name'];
 

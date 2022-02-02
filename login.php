@@ -41,9 +41,9 @@ if (isset($_SESSION['logged']))
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
 			<a class="navbar-brand" href="index.php"><img src="img/logo.png"  width="52" alt="logo" class="d-inline-block align-center mr-2 ">
 				<?php
-				if(isset($_SESSION['login'])) 
+				if(isset($_SESSION['name'])) 
 				{
-					echo "Nice to see you, ".$_SESSION['login']."!";
+					echo "Nice to see you, ".$_SESSION['name']."!";
 				}
 				else 
 				{
@@ -82,12 +82,12 @@ if (isset($_SESSION['logged']))
 					<h3 class="my-3">Sign in</h3>
 					<hr>
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-						<label for="userName">User name</label>
-						<input type="text" class="form-control d-block" name="login" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'"
+						<label for="email">Email</label>
+						<input type="email" class="form-control d-block" name="email" aria-descirbedby="email" placeholder="email" onfocus="this.placeholder=''" onblur="this.placeholder='email'"
 						<?php 
-						if(isset($_SESSION['given_login']))
+						if(isset($_SESSION['given_email']))
 						{	
-							'value="' .$_SESSION['given_login'] .'"';
+							'value="' .$_SESSION['given_email'] .'"';
 						}
 						?>
 						>
@@ -98,19 +98,20 @@ if (isset($_SESSION['logged']))
 					</div>
 					<input type="submit" class="d-block col-sm-6 offset-sm-3 col-md-4 offset-md-4 col-lg-4 offset-lg-4 my-5" value="enter">
 				</form>
-				<hr>
-				<div class="goToRegistration d-block mt-4">
-					or click <a href="regi.php">here</a> if you haven't signed up yet
-				</div>
-			</div>
-			<?php
+				<?php
 
 				if(isset($_SESSION['blad']))
 				{
 					echo'<p style="color: red">wrong login or password</p>';
 					unset ($_SESSION['blad']);
 				}
-			?>
+				?>
+				<hr>
+				<div class="goToRegistration d-block mt-4">
+					or click <a href="regi.php">here</a> if you haven't signed up yet
+				</div>
+			</div>
+		
 		</section>
 	</main>	
 	

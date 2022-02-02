@@ -42,9 +42,9 @@
 		<nav class="navbar navbar-light bg-piggy navbar-expand-md py-1">
 			<a class="navbar-brand" href="index.php"><img src="img/logo.png" width="52" alt="logo" class="d-inline-block align-bottom mr-2 ">
 			<?php
-				if(isset($_SESSION['given_login'])) 
+				if(isset($_SESSION['name'])) 
 				{
-					echo "Nice to see you, ".$_SESSION['given_login']."!";
+					echo "Nice to see you, ".$_SESSION['name']."!";
 				}
 				else 
 				{
