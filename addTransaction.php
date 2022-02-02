@@ -10,33 +10,23 @@ session_start();
 	$note = $_SESSION['comment'];
 	
 	//połącz z bazą
-	require_once "connect.php";
+	require_once "database.php";
 		
-	mysqli_report(MYSQLI_REPORT_STRICT);
-	
 	try
 	{
-		$connection = new mysqli($host, $db_user, $db_password, $db_name);
-		if($connection->connect_errno!=0)
+		//add transaction to db
+		$sql = "INSERT INTO transactions VALUES(NULL, '$userId', '$date', '$amount', '$group', '$type', '$note')";
+		$addTransaction = $db->prepare($sql);
+		if($addTransaction->execute())
 		{
-			throw new Exception(mysqli_connect_errno());
+			$_SESSION['transactionAdded']=true;
+			header('Location: lastTransactions.php');
 		}
 		else
 		{
-			//add transaction to db
-			if($connection->query("INSERT INTO transactions VALUES(NULL, '$userId', '$date', '$amount', '$group', '$type', '$note')"))
-			{
-				$_SESSION['transactionAdded']=true;
-				$connection->close();
-				header('Location: lastTransactions.php');
-			}
-			else
-			{
-				throw new Exception($connection->error);
-			}
-						
-			
+			throw new Exception('Database error. We are really sorry! Try again later..');
 		}
+
 	}
 	catch(Exception $e)
 	{

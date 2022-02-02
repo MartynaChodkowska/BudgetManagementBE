@@ -2,12 +2,12 @@
 
 session_start();
 
-	if(isset($_POST['userName']))
+	if(isset($_POST['email']))
 		{
 			//validation ok
 			$allOK = true;
 			
-				
+			/*	
 			//if login correct
 			$login = $_POST['userName'];
 						
@@ -21,7 +21,20 @@ session_start();
 			{
 				$allOK = false;
 				$_SESSION['e_login'] = "Login has to contain only digits and characters (no special characters).";
-			}
+			}*/
+			
+			//email validation
+			$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+			if(empty($email))
+				{
+					$_SESSION['wrongEmailFormat'] = $_POST['email'];	
+					echo "dupa";
+					$allOK = false;
+					header('Location: index.php');
+				}
+			else
+				$_SESSION['given_email']=$_POST['email'];
+			
 			
 			//first name validation
 			$fname = $_POST['firstName'];
@@ -96,29 +109,25 @@ session_start();
 			
 			//check if login does not already exist
 			require_once "database.php";
-			
-			mysqli_report(MYSQLI_REPORT_STRICT);
-			
+		
 			try
 			{
-				$usersQuery = $db->prepare('SELECT userId FROM users WHERE login = :login');
-				$usersQuery->bindValue(':login', $login, PDO::PARAM_STR);
+				$usersQuery = $db->prepare('SELECT userId FROM users WHERE email = :email');
+				$usersQuery->bindValue(':email', $email, PDO::PARAM_STR);
 				$usersQuery->execute();
 				
-				$howManyLogins = $usersQuery->rowCount();
+				$howManyEmails = $usersQuery->rowCount();
 				
-				if($howManyLogins>0)
+				if($howManyEmails>0)
 				{
 					$allOK = false;
-					$_SESSION['e_login']="There is an account with this login.";
+					$_SESSION['e_email']="There is an account with this email.";
 				}
 					
 				else if($allOK == true)
 				{
 					//adding user to database
-					$insertUser = $db->prepare("INSERT INTO users VALUES(NULL, '$login', '$pass_hash', '$fname', '$sname')");
-					
-					
+					$insertUser = $db->prepare("INSERT INTO users VALUES(NULL, '$email', '$pass_hash', '$fname', '$sname')");
 					if($insertUser->execute())
 					{
 						$_SESSION['regiOK']=true;
@@ -126,7 +135,7 @@ session_start();
 					}
 					else
 					{
-						throw new Exception($usersQuery->error);
+						throw new Exception('something went wrong.. please try again later');
 					}
 					
 				}
@@ -215,18 +224,35 @@ session_start();
 				<form id="registration" method="post">
 					<h3 class="my-3">Registration</h3>
 					<hr>
-					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+					<!--<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="userName">User name</label>
 						<input type="text" class="form-control d-block" id="userName" name="userName" aria-descirbedby="userName" placeholder="user name" onfocus="this.placeholder=''" onblur="this.placeholder='user name'">
+					</div>-->
+					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+						<label for="email">email adress (it will be your login)</label>
+						<input type="email" class="form-control d-block" id="email" name="email" aria-descirbedby="userName" placeholder="e-mail" onfocus="this.placeholder=''" onblur="this.placeholder='email'"
+						<?php 
+						if(isset($_SESSION['given_email']))
+						{	
+							'value="' .$_SESSION['given_email'] .'"';
+						}
+						?>
+						>
 					</div>
-					
 					<?php
-						if(isset($_SESSION['e_login']))
+						if(isset($_SESSION['wrongEmailFormat']))
 						{
-							echo '<div class="error">'.$_SESSION['e_login'].'</div>';
-							unset($_SESSION['e_login']);
+							echo '<p>Wrong email format!</p>';
+							unset($_SESSION['wrongEmailFormat']);
+						}
+					
+						elseif(isset($_SESSION['e_email']))
+						{
+							echo $_SESSION['e_email'].'<br>';
+							unset($_SESSION['e_email']);
 						}
 					?>
+					
 					<div class="form-group col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 						<label for="firstName">First name</label>
 						<input type="text" class="form-control d-block" id="firstName" name="firstName" aria-descirbedby="firstName" placeholder="first name" onfocus="this.placeholder=''" onblur="this.placeholder='first name'">
